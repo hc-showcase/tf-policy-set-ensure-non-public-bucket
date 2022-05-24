@@ -67,6 +67,5 @@ deny_unsupported_bucket_access_control = rule {
 main = rule {
 	deny_unsupported_bucket_iam_policies and
 	deny_unsupported_bucket_iam_bindings and
-	deny_unsupported_bucket_iam_members and
 	deny_unsupported_bucket_access_control
 }
