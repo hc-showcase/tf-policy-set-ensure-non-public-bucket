@@ -27,6 +27,13 @@ allBucketIAMPolicies = filter tfplan.resource_changes as _, resource_changes {
 			resource_changes.change.actions is ["update"])
 }
 
+allBucketAccessControl = filter tfplan.resource_changes as _, resource_changes {
+        resource_changes.type is "google_storage_bucket_access_control" and
+	        resouce_changes.mode is "managed" and
+		(resource_changes.change.actions contains "create" or
+		        resource_changes.change.actions is ["update"])
+}
+
 print("CIS 5.1: Ensure that Cloud Storage bucket is not anonymously or publicly accessible")
 
 deny_unsupported_bucket_iam_members = rule {
@@ -53,8 +60,15 @@ deny_unsupported_bucket_iam_policies = rule {
 	}
 }
 
+deny_unsupported_bucket_access_control = rule {
+	all allBucketAccessControl as _, ac {
+	       ac.change.after.entity not in allUnsupportedMembers
+	} 
+}
+
 main = rule {
 	deny_unsupported_bucket_iam_policies and
 	deny_unsupported_bucket_iam_bindings and
-	deny_unsupported_bucket_iam_members
+	deny_unsupported_bucket_iam_members and
+	deny_unsupported_bucket_access_control
 }
