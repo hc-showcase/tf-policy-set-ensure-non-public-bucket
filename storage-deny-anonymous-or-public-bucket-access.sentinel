@@ -29,7 +29,10 @@ allBucketIAMPolicies = filter tfplan.resource_changes as _, resource_changes {
 
 allBucketAccessControl = filter tfplan.resource_changes as _, resource_changes {
         resource_changes.type is "google_storage_bucket_access_control" and
-	        resource_changes.mode is "managed"
+	        resource_changes.mode is "managed" and
+		(resource_changes.change.actions contains "create" or 
+		 resource_changes.change.actions contains "no-op" or
+                             resource_changes.change.actions is ["update"])
 }
 
 print("CIS 5.1: Ensure that Cloud Storage bucket is not anonymously or publicly accessible")
